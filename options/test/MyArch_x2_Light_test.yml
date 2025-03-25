@@ -1,0 +1,82 @@
+name: MyArch_x2_Light_test_continue_50000 # python mysr/test.py -opt options/test/MyArch_x2_Light_test.yml
+model_type: MyModel
+scale: 2
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+datasets:
+  test_1:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: datasets/Set5/HR
+    dataroot_lq: datasets/Set5/LR_bicubic/X2
+    io_backend:
+      type: disk
+
+  val_2:
+    name: Set14
+    type: PairedImageDataset
+    dataroot_gt: datasets/Set14/HR
+    dataroot_lq: datasets/Set14/LR_bicubic/X2
+    io_backend:
+      type: disk
+  val_3:
+    name: Urban100
+    type: PairedImageDataset
+    dataroot_gt: datasets/Urban100/HR
+    dataroot_lq: datasets/Urban100/LR_bicubic/X2
+    io_backend:
+      type: disk
+  val_4:
+    name: B100
+    type: PairedImageDataset
+    dataroot_gt: datasets/B100/HR
+    dataroot_lq: datasets/B100/LR_bicubic/X2
+    io_backend:
+      type: disk
+  val_5:
+    name: Manga109
+    type: PairedImageDataset
+    dataroot_gt: datasets/Manga109/HR
+    dataroot_lq: datasets/Manga109/LR_bicubic/X2
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: MyArch
+  upscale: 2
+  num_feat: 60
+  num_block: 24
+  num_in_ch: 3
+  num_out_ch: 3
+  dygroup: 4
+  factor: 15
+  act: 'relu'
+  img_range: 255.
+  rgb_mean: [0.4488, 0.4371, 0.4040]
+
+# path
+path:
+  pretrain_network_g: experiments/MyArch_x2_Light/models/net_g_50000.pth
+  param_key_g: params_ema
+  strict_load_g: true
+
+train:
+  ema_decay: 0.999
+
+# validation settings
+val:
+  save_img: false
+  suffix: ~  # add suffix to saved images, if None, use exp name
+  visualization: results
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 2
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 2
+      test_y_channel: true
